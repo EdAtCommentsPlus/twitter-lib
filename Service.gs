@@ -29,7 +29,7 @@ var Service_ = function(serviceName) {
   this.paramLocation_ = 'auth-header';
   this.method_ = 'get';
   this.oauthVersion_ = '1.0a';
-  this.projectKey_ = eval('Script' + 'App').getProjectKey();
+  this.scriptId_ = eval('Script' + 'App').getScriptId();
   this.signatureMethod_ = 'HMAC-SHA1';
   this.propertyStore_ = new MemoryProperties();
 };
@@ -120,16 +120,15 @@ Service_.prototype.setOAuthVersion = function(oauthVersion) {
 };
 
 /**
- * Sets the project key of the script that contains the authorization callback
- * function (required). The project key can be found in the Script Editor UI
+ * Sets the Script Id of the script that contains the authorization callback
+ * function (required). The Script Id can be found in the Script Editor UI
  * under "File > Project properties".
- * @param {string} projectKey The project key of the project containing the
+ * @param {string} scriptId The script Id of the project containing the
  *     callback function.
  * @return {Service_} This service, for chaining.
- * @deprecated The project key is now be determined automatically.
  */
-Service_.prototype.setProjectKey = function(projectKey) {
-  this.projectKey_ = projectKey;
+Service_.prototype.setScriptId = function(ScriptId) {
+  this.scriptId_ = scriptId;
   return this;
 };
 
@@ -219,7 +218,7 @@ Service_.prototype.setAccessToken = function(token, secret) {
  * Starts the authorization process. A new token will be generated and the
  * authorization URL for that token will be returned. Have the user visit this
  * URL and approve the authorization request. The user will then be redirected
- * back to your application using the project key and callback function name
+ * back to your application using the script id and callback function name
  * specified, so that the flow may continue.
  * @returns {string} The authorization URL for a new token.
  */
@@ -387,6 +386,7 @@ Service_.prototype.fetchInternal_ = function(url, params, opt_token,
     'Consumer Key': this.consumerKey_,
     'Consumer Secret': this.consumerSecret_
   });
+  Logger.log(url);
   params = params || {};
   params.method = params.method || 'get';
   var token = opt_token || null;
@@ -526,14 +526,14 @@ Service_.prototype.getCallbackUrl_ = function() {
   validate_({
     'Callback Function Name': this.callbackFunctionName_,
     'Service Name': this.serviceName_,
-    'Project Key': this.projectKey_
+    'Script Id': this.scriptId_
   });
   var stateToken = eval('Script' + 'App').newStateToken()
       .withMethod(this.callbackFunctionName_)
       .withArgument('serviceName', this.serviceName_)
       .withTimeout(3600)
       .createToken();
-  return buildUrl_(getCallbackUrl(this.projectKey_), {
+  return buildUrl_(getCallbackUrl(this.scriptId_), {
     state: stateToken
   });
 };
