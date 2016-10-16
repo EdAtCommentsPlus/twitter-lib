@@ -36,7 +36,7 @@ function OAuth(properties) {
       .setRequestTokenUrl('https://api.twitter.com/oauth/request_token')
       .setAuthorizationUrl('https://api.twitter.com/oauth/authorize')
       .setCallbackFunction('authCallback')
-      .setProjectKey(ScriptApp.getProjectKey());
+      .setScriptId(ScriptApp.ScriptId());
   
   if(properties) {
     this.setPropertyStore(properties); 
